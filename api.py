@@ -99,7 +99,7 @@ class SimpleTV:
                 urls.append(url)
         return {'base':stream_base, 'urls':urls}
 
-    def save_episode(self, group_id, instance_id, item_id, quality):
+    def retrieve_episode(self, group_id, instance_id, item_id, quality):
         '''Specify quality using int for entry into m3u8. Typically:
         0 = 500000, 1 = 1500000, 2 = 4500000
         '''
@@ -112,8 +112,7 @@ class SimpleTV:
                 chunks.append(line)
         for chunk in chunks:
             url = s_info['base'] + chunk
-            data = urllib.urlopen(url)
-            print data.read()
+            yield urllib.urlopen(url).read()
 
 if  __name__ =='__main__':
     username = sys.argv[1]
@@ -125,7 +124,7 @@ if  __name__ =='__main__':
     #    show['episodes'] = episodes
     #print shows
     episode = s.get_episodes(shows[1]['group_id'])[0]
-    print s.save_episode(
+    print s.retrieve_episode(
             shows[1]['group_id'],
             episode['instance_id'],
             episode['item_id'],
