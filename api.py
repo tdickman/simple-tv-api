@@ -1,5 +1,6 @@
 from xml.etree import ElementTree as et
 from BeautifulSoup import BeautifulSoup
+import os
 import requests
 import urllib
 import json
@@ -10,8 +11,7 @@ class SimpleTV:
         self.remote = True
         self.date = '2014%2F1%2F16+1%3A56%3A5'
         self.s = requests.Session()
-        if self._login(username, password):
-            print "Login successful"
+        self._login(username, password)
 
     def _login(self, username, password):
         url = 'https://www.simple.tv/Auth/SignIn'
@@ -24,7 +24,7 @@ class SimpleTV:
         resp = json.loads(r.text)
         if 'SignInError' in resp:
             print "Error logging in"
-            return False
+            raise('Invalid login information')
         self.sid = resp['MediaServerID']
         # Retrieve streaming urls
         r = self.s.get('https://my.simple.tv/')
@@ -75,7 +75,7 @@ class SimpleTV:
             episodes.append(data)
         return episodes
 
-    def stream_episode(self, group_id, instance_id, item_id):
+    def _get_stream_urls(self, group_id, instance_id, item_id):
         url  = 'https://my.simple.tv/Library/Player'
         url += '?browserUTCOffsetMinutes=-300'
         url += '&groupID=' + group_id
@@ -89,7 +89,31 @@ class SimpleTV:
             base = self.remote_base
         else:
             base = self.local_base
-        return base + s['data-streamlocation']
+        req_url = base + s['data-streamlocation']
+        stream_base = "/".join(req_url.split('/')[:-1]) + "/"
+        # Get urls for different qualities
+        r = self.s.get(req_url)
+        urls = []
+        for url in r.text.split('\n'):
+            if url[-3:] == "3u8":
+                urls.append(url)
+        return {'base':stream_base, 'urls':urls}
+
+    def save_episode(self, group_id, instance_id, item_id, quality):
+        '''Specify quality using int for entry into m3u8. Typically:
+        0 = 500000, 1 = 1500000, 2 = 4500000
+        '''
+        s_info = self._get_stream_urls(group_id, instance_id, item_id)
+        r = requests.get(s_info['base'] + s_info['urls'][int(quality)])
+        # Parse for lines starting in 'tv'
+        chunks = []
+        for line in r.text.split('\n'):
+            if line[:2] == "tv":
+                chunks.append(line)
+        for chunk in chunks:
+            url = s_info['base'] + chunk
+            data = urllib.urlopen(url)
+            print data.read()
 
 if  __name__ =='__main__':
     username = sys.argv[1]
@@ -101,8 +125,9 @@ if  __name__ =='__main__':
     #    show['episodes'] = episodes
     #print shows
     episode = s.get_episodes(shows[1]['group_id'])[0]
-    print s.stream_episode(
+    print s.save_episode(
             shows[1]['group_id'],
             episode['instance_id'],
-            episode['item_id']
+            episode['item_id'],
+            0
             )
