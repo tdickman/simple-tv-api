@@ -32,6 +32,7 @@ class SimpleServer(object):
         return self.s.retrieve_episode(group_id, instance_id, item_id, quality)
 
     stream._cp_config = {'response.stream': True}
+    cherrypy.server.socket_host = '0.0.0.0'
 
 if  __name__ =='__main__':
     username = sys.argv[1]
