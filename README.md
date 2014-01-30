@@ -7,7 +7,7 @@ Downloading Recordings
 
 This is an interactive python script used to download recordings from your simple.tv device to your local computer. Recordings are placed in the current directory with the name 'episode.ts'.
 
-Example useage:
+Example usage:
 
 ```python download.py```
 
@@ -15,7 +15,7 @@ Example useage:
 API Server
 ==========
 
-Example useage:
+Example usage:
 
 ```python server.py [username] [password]```
 
