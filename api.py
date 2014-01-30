@@ -8,7 +8,7 @@ import sys
 
 class SimpleTV:
     def __init__(self, username, password):
-        self.remote = True
+        self.remote = None
         self.date = '2014%2F1%2F16+1%3A56%3A5'
         self.s = requests.Session()
         self._login(username, password)
@@ -95,6 +95,14 @@ class SimpleTV:
         req_url = base + s['data-streamlocation']
         stream_base = "/".join(req_url.split('/')[:-1]) + "/"
         # Get urls for different qualities
+        # First time through, autodetect if remote
+        if self.remote == None:
+            try:
+                r = self.s.get(req_url, timeout=5)
+                self.remote = False
+            except:
+                self.remote = True
+                return self._get_stream_urls(group_id, instance_id, item_id)
         r = self.s.get(req_url)
         urls = []
         for url in r.text.split('\n'):

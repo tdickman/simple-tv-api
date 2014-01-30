@@ -26,9 +26,10 @@ episode = episodes[episode_id]
 instance_id = episode['instance_id']
 item_id     = episode['item_id']
 quality     = 2
-name = show['name'] + " - " + episode['title'] + '.ts'
+file_name = show['name'] + " - " + episode['title'] + '.ts'
 counter = 0
-with open('episode.ts', 'w') as f:
+print "Downloading..."
+with open(file_name, 'w') as f:
     for data in simple.retrieve_episode(group_id, instance_id, item_id, quality):
         f.write( data )
         counter += 1
