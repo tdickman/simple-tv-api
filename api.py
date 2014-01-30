@@ -69,7 +69,10 @@ class SimpleTV:
                 links = episode.find('a', {'class':'button-standard-watch'})
                 data['item_id']     = links['data-itemid']
                 data['instance_id'] = links['data-instanceid']
-                data['title']       = episode.h3.text
+                data['title']       = episode.h3.find(
+                                            text=True,
+                                            recursive=False
+                                            ).rstrip()
             except:
                 continue
             episodes.append(data)
