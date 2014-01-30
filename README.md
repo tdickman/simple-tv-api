@@ -2,6 +2,19 @@ simple-tv-api
 =============
 This is an api for accessing and playing back Simple.tv recordings.
 
+Downloading Recordings
+======================
+
+This is an interactive python script used to download recordings from your simple.tv device to your local computer. Recordings are placed in the current directory with the name 'episode.ts'.
+
+Example useage:
+
+```python download.py```
+
+
+API Server
+==========
+
 Example useage:
 
 ```python server.py [username] [password]```
