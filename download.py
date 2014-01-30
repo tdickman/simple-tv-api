@@ -12,7 +12,8 @@ shows = simple.get_shows()
 for val,show in enumerate(shows):
     print str(val) + ": " + show['name']
 show_id = input("Select show (#): ")
-group_id = shows[show_id]['group_id']
+show = shows[show_id]
+group_id = show['group_id']
 
 # Select episode
 episodes = simple.get_episodes(group_id)
@@ -25,6 +26,7 @@ episode = episodes[episode_id]
 instance_id = episode['instance_id']
 item_id     = episode['item_id']
 quality     = 2
+name = show['name'] + " - " + episode['title'] + '.ts'
 counter = 0
 with open('episode.ts', 'w') as f:
     for data in simple.retrieve_episode(group_id, instance_id, item_id, quality):
