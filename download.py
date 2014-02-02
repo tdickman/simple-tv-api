@@ -10,7 +10,7 @@ simple = api.SimpleTV(username, password)
 # Select show
 shows = simple.get_shows()
 for val,show in enumerate(shows):
-    print str(val) + ": " + show['name']
+    print str(val) + ": " + show['name'].encode('utf-8')
 show_id = input("Select show (#): ")
 show = shows[show_id]
 group_id = show['group_id']
@@ -18,7 +18,7 @@ group_id = show['group_id']
 # Select episode
 episodes = simple.get_episodes(group_id)
 for val,episode in enumerate(episodes):
-    print str(val) + ": " + episode['title']
+    print str(val) + ": " + episode['title'].encode('utf-8')
 episode_id = input("Select episode (#): ")
 episode = episodes[episode_id]
 
