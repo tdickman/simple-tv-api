@@ -110,20 +110,17 @@ class SimpleTV:
                 urls.append(url)
         return {'base':stream_base, 'urls':urls}
 
-    def retrieve_episode(self, group_id, instance_id, item_id, quality):
+    def retrieve_episode_mp4(self, group_id, instance_id, item_id, quality):
         '''Specify quality using int for entry into m3u8. Typically:
         0 = 500000, 1 = 1500000, 2 = 4500000
         '''
         s_info = self._get_stream_urls(group_id, instance_id, item_id)
-        r = requests.get(s_info['base'] + s_info['urls'][int(quality)])
-        # Parse for lines starting in 'tv'
-        chunks = []
-        for line in r.text.split('\n'):
-            if line[:2] == "tv":
-                chunks.append(line)
-        for chunk in chunks:
-            url = s_info['base'] + chunk
-            yield urllib.urlopen(url).read()
+        # Modify url for h264 mp4 :)
+        url_m3u8 = s_info['base'] + s_info['urls'][int(quality)]
+        url = url_m3u8.replace('hls-0.m3u8', '100')
+        if url == url_m3u8:
+            url = url_m3u8.replace('hls-1.m3u8', '100')
+        return url
 
 if  __name__ =='__main__':
     username = sys.argv[1]

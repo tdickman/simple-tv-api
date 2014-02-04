@@ -1,6 +1,7 @@
 import getpass
 import api
 import sys
+import urllib
 
 username = raw_input("Enter email: ")
 password = getpass.getpass("Enter password: ")
@@ -26,13 +27,9 @@ episode = episodes[episode_id]
 instance_id = episode['instance_id']
 item_id     = episode['item_id']
 quality     = 2
-file_name = show['name'] + " - " + episode['title'] + '.ts'
+file_name = show['name'] + " - " + episode['title'] + '.mp4'
 counter = 0
+print "Retrieving download url"
+url = simple.retrieve_episode_mp4(group_id, instance_id, item_id, quality)
 print "Downloading..."
-with open(file_name, 'w') as f:
-    for data in simple.retrieve_episode(group_id, instance_id, item_id, quality):
-        f.write( data )
-        counter += 1
-        message = "\rDownloading, " + str(counter) + " blocks complete"
-        print message,
-        sys.stdout.flush()
+(filename, headers) = urllib.urlretrieve(url, file_name)
