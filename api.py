@@ -14,7 +14,7 @@ class SimpleTV:
         self._login(username, password)
 
     def _login(self, username, password):
-        url = 'https://www.simple.tv/Auth/SignIn'
+        url = 'https://us.simple.tv/Auth/SignIn'
         data = {
                 'UserName'   : username,
                 'Password'   : password,
