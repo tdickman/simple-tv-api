@@ -27,15 +27,23 @@ class SimpleTV:
             raise('Invalid login information')
         self.sid = resp['MediaServerID']
         # Retrieve streaming urls
-        r = self.s.get('https://my.simple.tv/')
+        r = self.s.get('https://us-my.simple.tv/')
         soup = BeautifulSoup(r.text)
         info = soup.find('section', {'id':'watchShow'})
-        self.local_base  = info['data-localstreambaseurl']
-        self.remote_base = info['data-remotestreambaseurl']
+        self.account_id      = info['data-accountid']
+        self.media_server_id = info['data-mediaserverid']
+        r = self.s.get('https://us-my.simple.tv/Data/RealTimeData'  + \
+                        '?accountId='       + self.account_id       + \
+                        '&mediaServerId='   + self.media_server_id  + \
+                        '&playerAlternativeAvailable=false'
+                        )
+        resp = json.loads(r.text)
+        self.local_base  = resp['LocalStreamBaseURL']
+        self.remote_base = resp['RemoteStreamBaseURL']
         return True
 
     def get_shows(self):
-        url  = 'https://my.simple.tv/Library/MyShows'
+        url  = 'https://us-my.simple.tv/Library/MyShows'
         url += '?browserDateTimeUTC=' + self.date
         url += '&mediaServerID=' + self.sid
         url += '&browserUTCOffsetMinutes=-300'
@@ -54,7 +62,7 @@ class SimpleTV:
         return shows
 
     def get_episodes(self, group_id):
-        url  = 'https://my.simple.tv/Library/ShowDetail'
+        url  = 'https://us-my.simple.tv/Library/ShowDetail'
         url += '?browserDateTimeUTC=' + self.date
         url += '&browserUTCOffsetMinutes=-300'
         url += '&groupID=' + group_id
@@ -79,12 +87,12 @@ class SimpleTV:
         return episodes
 
     def _get_stream_urls(self, group_id, instance_id, item_id):
-        url  = 'https://my.simple.tv/Library/Player'
+        url  = 'https://us-my.simple.tv/Library/Player'
         url += '?browserUTCOffsetMinutes=-300'
         url += '&groupID=' + group_id
         url += '&instanceID=' + instance_id
         url += '&itemID=' + item_id
-        url += '&isReachedRemotely=' + ("True" if self.remote else "False")
+        url += '&isReachedLocally=' + ("False" if self.remote else "True")
         r = self.s.get(url)
         soup = BeautifulSoup(r.text)
         s = soup.find('div', {'id':'video-player-large'})
