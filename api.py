@@ -59,9 +59,10 @@ class SimpleTV:
             data['name']       = info.find('b').text
             data['recordings'] = info.find('span').text
             shows.append(data)
-        return shows
-
+        return shows		
+		
     def get_episodes(self, group_id):
+#        print "get_episodes group_id=" , group_id
         url  = 'https://us-my.simple.tv/Library/ShowDetail'
         url += '?browserDateTimeUTC=' + self.date
         url += '&browserUTCOffsetMinutes=-300'
@@ -74,18 +75,28 @@ class SimpleTV:
             data = {}
             # Skip failed episodes for now
             try:
-                links = episode.find('a', {'class':'button-standard-watch'})
-                data['item_id']     = links['data-itemid']
-                data['instance_id'] = links['data-instanceid']
-                data['title']       = episode.h3.find(
-                                            text=True,
-                                            recursive=False
-                                            ).rstrip()
-            except:
+				epiList      = episode.findAll('b')
+				if len(epiList) == 3:   # Figure out if it's a Show or a Movie
+					data['season'] = int(epiList[1].text)
+					data['episode'] = int(epiList[2].text)
+				else:
+#					print "DEBUG: Season/Episode now = 0"
+					data['season'] = 0
+					data['episode'] = 0
+				links = episode.find('a', {'class':'button-standard-watch'})
+				data['item_id']     = links['data-itemid']
+				data['instance_id'] = links['data-instanceid']
+				data['title']       = episode.h3.find(
+				                              text=True,
+				                              recursive=False
+				                              ).rstrip()
+            except :
+#		z = e
+#		print z
                 continue
             episodes.append(data)
         return episodes
-
+	
     def _get_stream_urls(self, group_id, instance_id, item_id):
         url  = 'https://us-my.simple.tv/Library/Player'
         url += '?browserUTCOffsetMinutes=-300'
@@ -123,11 +134,11 @@ class SimpleTV:
         0 = 500000, 1 = 1500000, 2 = 4500000
         '''
         s_info = self._get_stream_urls(group_id, instance_id, item_id)
-        # Modify url for h264 mp4 :)
+	# Modify url for h264 mp4 :)
         url_m3u8 = s_info['base'] + s_info['urls'][int(quality)]
         url = url_m3u8.replace('hls-0.m3u8', '100')
         if url == url_m3u8:
-            url = url_m3u8.replace('hls-1.m3u8', '100')
+            url = url_m3u8.replace('hls-1.m3u8', '101') # Changed to 101 (from 100)
         return url
 
 if  __name__ =='__main__':
