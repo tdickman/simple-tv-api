@@ -83,6 +83,7 @@ class SimpleTV:
 #					print "DEBUG: Season/Episode now = 0"
 					data['season'] = 0
 					data['episode'] = 0
+				data['channel'] = str(epiList[0].text)
 				links = episode.find('a', {'class':'button-standard-watch'})
 				data['item_id']     = links['data-itemid']
 				data['instance_id'] = links['data-instanceid']
