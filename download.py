@@ -64,6 +64,9 @@ def generate_filename_menu(episodes, show):
                 episode=episode['episode'],
                 title=episode['title']
                 )
+        episode['filename'] = episode['filename'] + "[" + episode['channel'] + "]"
+        episode['filename'] = episode['filename'].replace(":", "-")
+        episode['filename'] = episode['filename'].replace("'", "")
         print str(val) + ": " + episode['filename'].encode('utf-8')
     return episodes
 
@@ -105,8 +108,8 @@ def download_all_shows(shows):
                 download_episode(show, episode)
 
 if __name__ == "__main__":
-    username = raw_input("Enter email: ")
-    password = getpass.getpass("Enter password: ")
+    username = USERNAME if 'USERNAME' in locals() else raw_input("Enter email: ")
+    password = PASSWORD if 'PASSWORD' in locals() else getpass.getpass("Enter password: ")
     print "Logging in...\n"
     print "Auto Delete set to {}, this can be changed in the settings section of download.py".format(str(AUTO_DELETE))
     print "-" * 25
