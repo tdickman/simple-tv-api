@@ -2,7 +2,7 @@ from xml.etree import ElementTree as et
 from BeautifulSoup import BeautifulSoup
 import requests
 import json
-
+import re
 
 class SimpleTV:
     def __init__(self, username, password):
@@ -23,13 +23,13 @@ class SimpleTV:
         if 'SignInError' in resp:
             print "Error logging in"
             raise('Invalid login information')
-        self.sid = resp['MediaServerID']
+        # self.sid = resp['MediaServerID']
         # Retrieve streaming urls
         r = self.s.get('https://us-my.simple.tv/')
         soup = BeautifulSoup(r.text)
         info = soup.find('section', {'id': 'watchShow'})
         self.account_id = info['data-accountid']
-        self.media_server_id = info['data-mediaserverid']
+        self.sid = self.media_server_id = info['data-mediaserverid']
         r = self.s.get("https://us-my.simple.tv/Data/RealTimeData"
                        "?accountId={}&mediaServerId={}"
                        "&playerAlternativeAvailable=false".format(self.account_id, self.media_server_id))
@@ -129,7 +129,6 @@ class SimpleTV:
         s_info = self._get_stream_urls(group_id, instance_id, item_id)
         # Modify url for h264 mp4 :)
         url_m3u8 = s_info['base'] + s_info['urls'][int(quality)]
-        url = url_m3u8.replace('hls-0.m3u8', '100')
-        if url == url_m3u8:
-            url = url_m3u8.replace('hls-1.m3u8', '101')  # Changed to 101 (from 100)
+	m = re.match(".*hls-(?P<number>\d)\Wm3u8", url_m3u8)
+	url =  re.sub('hls-\d.m3u8', "10" + m.group("number") , url_m3u8)
         return url
