@@ -81,8 +81,11 @@ def download_episode(show, episode):
     url = simple.retrieve_episode_mp4(group_id, instance_id, item_id, quality)
     print "Downloading " + file_name
     (filename, headers) = urllib.urlretrieve(url, file_name)
-    print "File size: ", os.path.getsize(file_name) >> 20, "MB"
-    if AUTO_DELETE:
+    file_size = os.path.getsize(file_name) >> 20
+    print "File size: ", file_size , "MB"
+    download_complete_bool = True if file_size > 20 else False
+    print "download_complete_bool: " , download_complete_bool
+    if AUTO_DELETE and download_complete_bool:
         url = "https://stv-p-api1-prod.rsslabs.net/content/actionjson/mediaserver/"
         url += simple.sid
         url += "/instance/"
