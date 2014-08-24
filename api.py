@@ -4,6 +4,7 @@ import requests
 import json
 import re
 
+
 class SimpleTV:
     def __init__(self, username, password):
         self.remote = None
@@ -129,6 +130,6 @@ class SimpleTV:
         s_info = self._get_stream_urls(group_id, instance_id, item_id)
         # Modify url for h264 mp4 :)
         url_m3u8 = s_info['base'] + s_info['urls'][int(quality)]
-	m = re.match(".*hls-(?P<number>\d)\Wm3u8", url_m3u8)
-	url =  re.sub('hls-\d.m3u8', "10" + m.group("number") , url_m3u8)
-        return url
+    m = re.match(".*hls-(?P<number>\d)\Wm3u8", url_m3u8)
+    url = re.sub('hls-\d.m3u8', "10" + m.group("number"), url_m3u8)
+    return url
